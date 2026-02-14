@@ -17,7 +17,7 @@
             display: flex;
         }
 
-        /* LEFT SIDEBAR - fake buttons for new chats and previous conversations */
+        /* LEFT SIDEBAR */
         .sidebar {
             width: 260px;
             background: rgba(255, 255, 255, 0.6);
@@ -83,7 +83,7 @@
             border-color: #f39c12;
         }
 
-        /* MAIN CONTENT - right side */
+        /* MAIN CONTENT */
         .main-content {
             flex: 1;
             display: flex;
@@ -91,10 +91,9 @@
             align-items: center;
             padding: 30px 20px;
             position: relative;
-            min-height: 100vh;
+            height: 100vh;
         }
 
-        /* header - simpler, smaller */
         h1 {
             font-size: 1.8rem;
             font-weight: 300;
@@ -109,15 +108,15 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.02);
         }
 
-        /* message container */
         .chat-container {
             max-width: 800px;
             width: 100%;
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end; /* pushes history up, leaves space for input */
+            justify-content: flex-end;
             margin-bottom: 20px;
+            position: relative;
         }
 
         .message-history {
@@ -137,14 +136,12 @@
             box-shadow: 0 10px 30px -15px rgba(0,0,0,0.1);
         }
 
-        /* when input is centered, history is barely visible */
         .message-history.faded {
             opacity: 0.2;
             pointer-events: none;
             transition: 0.4s;
         }
 
-        /* message bubbles */
         .bot-message, .user-message {
             padding: 14px 20px;
             border-radius: 28px;
@@ -173,27 +170,25 @@
             max-width: 750px;
             width: 100%;
             transition: all 0.5s cubic-bezier(0.25, 0.1, 0.2, 1.1);
-            margin: 0 auto;
         }
 
-        /* centered state */
+        /* centered state - now relative to main content, not whole page */
         .input-wrapper.centered {
-            position: fixed;
+            position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) !important;
-            width: min(700px, 80%);
+            transform: translate(-50%, -50%);
+            width: min(700px, 90%);
             z-index: 100;
         }
 
-        /* bottom state (normal) */
+        /* bottom state */
         .input-wrapper:not(.centered) {
             position: relative;
             transform: none;
             margin-top: 20px;
         }
 
-        /* the actual text bar */
         .input-area {
             display: flex;
             align-items: center;
@@ -242,21 +237,20 @@
             transform: scale(1.02);
         }
 
-        /* fake button container */
         .fake-buttons {
             display: flex;
             flex-direction: column;
             gap: 6px;
         }
 
-        /* no emoji bar, no extra fluff */
-        .chat-bar {
-            display: none;
+        /* make main content a positioning context */
+        .main-content {
+            position: relative;
         }
     </style>
 </head>
 <body>
-    <!-- LEFT SIDEBAR with fake buttons -->
+    <!-- LEFT SIDEBAR -->
     <div class="sidebar">
         <button class="new-chat-btn">+ New chat</button>
         <div class="previous-label">PREVIOUS</div>
@@ -270,17 +264,17 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <div class="main-content">
+    <div class="main-content" id="mainContent">
         <h1>How can I help you, ya' Tosspot?</h1>
 
-        <!-- message history container -->
+        <!-- message history container (empty) -->
         <div class="chat-container">
             <div class="message-history" id="messageHistory">
-                <!-- empty initially -->
+                <!-- intentionally empty -->
             </div>
         </div>
 
-        <!-- INPUT - starts centered, moves to bottom -->
+        <!-- INPUT - starts centered in main content -->
         <div class="input-wrapper centered" id="inputWrapper">
             <div class="input-area">
                 <input type="text" 
@@ -299,11 +293,7 @@
             const chatInput = document.getElementById('chatInput');
             const sendButton = document.getElementById('sendButton');
 
-            // add a sample bot message so it's not empty
-            const botGreeting = document.createElement('div');
-            botGreeting.className = 'bot-message';
-            botGreeting.textContent = 'Hello! What\'s on your mind?';
-            messageHistory.appendChild(botGreeting);
+            // NO initial message - history starts empty
 
             let centered = true;
 
@@ -364,7 +354,7 @@
                 }
             });
 
-            // clicking on sidebar items also brings input down (for consistency)
+            // clicking on sidebar items also brings input down
             document.querySelectorAll('.conv-item, .new-chat-btn').forEach(el => {
                 el.addEventListener('click', () => {
                     if (centered) moveToBottom();
