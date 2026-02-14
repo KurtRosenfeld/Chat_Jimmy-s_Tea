@@ -487,6 +487,11 @@
                 const botDiv = createResponseBubble(response);
                 messageHistory.appendChild(botDiv);
 
+                // text part with line breaks
+const textDiv = document.createElement('div');
+textDiv.style.whiteSpace = 'pre-line';  // This makes \n create line breaks
+textDiv.textContent = response.text;
+
                 chatInput.value = '';
                 messageHistory.scrollTop = messageHistory.scrollHeight;
             }
