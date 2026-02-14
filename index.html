@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
-    <title>Chat_Jimmy-s_Tea</title>
-  </head>
-  <style>
-    body{
-   font-family: 'Comic Sans', cursive, sans-serif;
-  background: linear-gradient(135deg, #EDEDED, #D8D8D8, #FCFCFC);
+    <title>Chat_Jimmy-s_Tea · modern float</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Comic Sans', cursive, sans-serif;
+            background: linear-gradient(135deg, #EDEDED, #D8D8D8, #FCFCFC);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -16,119 +21,381 @@
             padding: 20px;
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
+            position: relative;
         }
-            @keyframes gradientBG {
+
+        @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-            .chat-container {
-            max-width: 700px;
+
+        /* title – softer, lighter */
+        h1 {
+            font-size: 2.6rem;
+            font-weight: 300;
+            margin: 0 0 25px 0;
+            text-align: center;
+            color: #2c3e50;
+            text-shadow: 0 2px 5px rgba(255,255,240,0.7);
+            letter-spacing: -0.5px;
+            word-break: break-word;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(4px);
+            padding: 15px 30px;
+            border-radius: 120px;
+            display: inline-block;
+            box-shadow: 0 8px 20px -8px rgba(0,0,0,0.1);
+        }
+
+        /* main container – minimal, nearly transparent, very "open" */
+        .chat-container {
+            max-width: 800px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(8px);
-            border-radius: 36px 36px 28px 28px;
-            box-shadow: 0 25px 40px -12px rgba(0, 20, 20, 0.35);
-            padding: 30px 25px 30px 25px;
-            border: 2px solid rgba(255, 255, 255, 0.5);
+            background: transparent;  /* no more solid card */
+            display: flex;
+            flex-direction: column;
+            transition: all 0.6s cubic-bezier(0.2, 0.9, 0.3, 1);
+            position: relative;
         }
-            .chat-bar {
-            font-size: 3rem;
-            font-weight: normal;
-            margin: 20px 0;
-            padding: 20px 40px;
-            border-radius: 15px;
-            background-color: rgba(44, 62, 80, 0.9);
+
+        /* message area – clean, minimal, no borders, subtle glow */
+        .message-history {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 42px 42px 32px 32px;
+            padding: 28px 22px;
+            min-height: 280px;
+            max-height: 55vh;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.1), inset 0 1px 4px rgba(255,255,255,0.8);
+            border: 1px solid rgba(255,255,255,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transition: all 0.4s ease;
+        }
+
+        /* hide message history initially? no, we keep it visible but very light.
+           but we want textbar centered at first — we handle with parent flex. */
+
+        /* message bubbles – soft, floating, no hard edges */
+        .bot-message, .user-message {
+            padding: 16px 22px;
+            border-radius: 32px;
+            max-width: 70%;
+            word-wrap: break-word;
+            box-shadow: 0 8px 18px -8px rgba(0,0,0,0.08), 0 0 0 1px rgba(255,255,255,0.6);
+            backdrop-filter: blur(4px);
+            font-weight: 400;
+            line-height: 1.5;
+            transition: 0.2s;
+        }
+
+        .bot-message {
+            background: rgba(44, 62, 80, 0.9);
             color: white;
-            text-align: right;
-            animation: glow 2s infinite alternate;
-            min-width: 200px;
+            align-self: flex-start;
+            border-bottom-left-radius: 8px;
         }
-    .message-history {
-    background: rgba(44, 62, 80, 0.06);
-    border-radius: 24px;
-    padding: 20px;
-    min-height: 300px;
-    max-height: 400px;
-    overflow-y: auto;
-    margin-bottom: 20px;
-    border: 2px dashed rgba(44, 62, 80, 0.2);
-}
 
-.input-area {
-    display: flex;
-    align-items: center;
-    background: white;
-    border-radius: 50px;
-    padding: 5px 5px 5px 20px;
-    border: 2px solid rgba(44, 62, 80, 0.3);
-}
+        .user-message {
+            background: rgba(243, 156, 18, 0.85);
+            backdrop-filter: blur(8px);
+            color: #1e2b37;
+            align-self: flex-end;
+            border-bottom-right-radius: 8px;
+        }
 
-.chat-input {
-    flex: 1;
-    border: none;
-    outline: none;
-    font-family: 'Comic Sans', cursive, sans-serif;
-    font-size: 1.2rem;
-    padding: 15px 0;
-    background: transparent;
-}
+        /* INPUT AREA — starts centered, then moves down */
+        .input-area {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 120px;
+            padding: 4px 4px 4px 24px;
+            border: 1.5px solid rgba(255,255,255,0.9);
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.7);
+            transition: all 0.5s cubic-bezier(0.25, 0.1, 0.15, 1.2);
+            width: 100%;
+            margin-top: 10px;   /* default: near history */
+        }
 
-.chat-input::placeholder {
-    color: #95a5a6;
-}
+        /* special class that moves input to the center of viewport (initially) */
+        .input-area.centered {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: min(650px, 90%);
+            z-index: 30;
+            box-shadow: 0 30px 60px -20px rgba(0,0,0,0.25), 0 0 0 2px rgba(255,255,240,0.9);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(25px);
+        }
 
-.send-button {
-    background: #2c3e50;
-    border: none;
-    border-radius: 50px;
-    padding: 12px 25px;
-    font-size: 1.1rem;
-    color: white;
-    cursor: pointer;
-    transition: 0.2s;
-}
+        /* when centered, hide message history (open feel) */
+        .input-area.centered ~ .message-history {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.96);
+            transition: 0.3s;
+        }
 
-.send-button:hover {
-    background: #D3335C;
-}
-    .bot-message, .user-message {
-    padding: 12px 18px;
-    border-radius: 20px;
-    margin: 10px 0;
-    max-width: 70%;
-    word-wrap: break-word;
-}
+        /* but message-history is after in DOM? we use sibling selector? 
+           structure: h1, chat-container (contains message-history, then input-area)
+           so input-area cannot be sibling of message-history — they're parent/child.
+           we need to adjust: we'll put input-area outside container? better restructure slightly.
+           LET'S FIX: we'll put .input-area as separate element after chat-container, 
+           and use JS to toggle. Simpler for modern layout.
+        */
 
-.bot-message {
-    background: #2c3e50;
-    color: white;
-    align-self: flex-start;
-}
+        /* redesigned structure: keep container for history only, input is separate and movable */
+        .chat-container {
+            max-width: 800px;
+            width: 100%;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
 
-.user-message {
-    background: #f39c12;
-    color: #1e2b37;
-    align-self: flex-end;
-    margin-left: auto;
-}
-</style>
-  <body>
-     <h1>How can I help you, ya' Tosspot?</h1>
-  <div class="chat-container">
-    <div class="message-history" id="messageHistory">
-    <!-- messages will appear here -->
-        <div class="bot-message">Hello! How can I help you today?</div>
-<div class="user-message">I have a question about tea</div>
+        /* standalone input wrapper — absolutely flexible */
+        .input-wrapper {
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            transition: 0.5s cubic-bezier(0.25, 0.1, 0.2, 1.2);
+            margin-top: 0;
+        }
+
+        .input-wrapper.centered {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: min(700px, 90%);
+            z-index: 100;
+        }
+
+        /* actual input area inside wrapper — glassy */
+        .input-area {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 120px;
+            padding: 4px 4px 4px 28px;
+            border: 1px solid rgba(255,255,255,0.95);
+            box-shadow: 0 20px 45px -20px rgba(0,0,0,0.2);
+            width: 100%;
+            transition: 0.2s;
+        }
+
+        .input-area:focus-within {
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1), 0 0 0 3px rgba(255, 215, 140, 0.6);
+        }
+
+        .chat-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-family: 'Comic Sans', cursive, sans-serif;
+            font-size: 1.4rem;
+            padding: 18px 0;
+            background: transparent;
+            color: #1e2b37;
+            min-width: 0;
+        }
+
+        .chat-input::placeholder {
+            color: #8a9aa8;
+            font-size: 1.3rem;
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        .send-button {
+            background: rgba(44, 62, 80, 0.9);
+            border: none;
+            border-radius: 100px;
+            padding: 14px 32px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: 0.15s;
+            backdrop-filter: blur(5px);
+            letter-spacing: 0.5px;
+            box-shadow: 0 6px 18px -6px #2c3e50;
+            margin-left: 8px;
+        }
+
+        .send-button:hover {
+            background: #D3335C;
+            transform: scale(1.02) translateY(-2px);
+            box-shadow: 0 15px 25px -10px #b03a5c;
+        }
+
+        /* optional chat-bar (your retro counter) — but let's modernize it lightly */
+        .chat-bar {
+            font-size: 2rem;
+            font-weight: 300;
+            margin: 5px 0 15px 0;
+            padding: 10px 30px;
+            border-radius: 80px;
+            background: rgba(44, 62, 80, 0.6);
+            backdrop-filter: blur(8px);
+            color: white;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.5);
+            display: inline-block;
+        }
+
+        /* subtle fade for history when input centered */
+        .history-fade {
+            transition: opacity 0.4s, transform 0.4s;
+        }
+        .history-fade.blurred {
+            opacity: 0.2;
+            transform: scale(0.97);
+            pointer-events: none;
+        }
+
+        /* responsive */
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .chat-input { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- your original chat-bar (still there, now softer) -->
+    <div class="chat-bar" id="chatBar">☕</div>
+
+    <h1>How can I help you, ya' Tosspot?</h1>
+
+    <!-- separate container for messages -->
+    <div class="chat-container">
+        <div class="message-history" id="messageHistory">
+            <div class="bot-message">Hello! How can I help you today?</div>
+            <div class="user-message">I have a question about tea</div>
+            <!-- extra sample to show layering -->
+            <div class="bot-message">Tell me more about that tea curiosity.</div>
+        </div>
     </div>
-    <div class="input-area">
-    <input type="text" 
-           class="chat-input" 
-           id="chatInput" 
-           placeholder="What ya' feelin' right now...">
-    <button class="send-button">Send</button>
-</div>
+
+    <!-- input wrapper – this will be centered initially, then moves down -->
+    <div class="input-wrapper centered" id="inputWrapper">
+        <div class="input-area">
+            <input type="text" 
+                   class="chat-input" 
+                   id="chatInput" 
+                   placeholder="What ya' feelin' right now...">
+            <button class="send-button" id="sendButton">Send</button>
+        </div>
     </div>
-  </body>
-  </body>
+
+    <script>
+        (function() {
+            const inputWrapper = document.getElementById('inputWrapper');
+            const messageHistory = document.getElementById('messageHistory');
+            const chatInput = document.getElementById('chatInput');
+            const sendButton = document.getElementById('sendButton');
+            const chatBar = document.getElementById('chatBar');
+
+            // state: is input centered? yes (by default class "centered")
+            let centered = true;
+
+            // we also add a class to messageHistory to fade it while centered
+            // to achieve "open, less boxy, history barely visible"
+            if (centered) {
+                messageHistory.classList.add('blurred');
+            }
+
+            // function to move input to bottom (remove centered, fade in history)
+            function moveInputToBottom() {
+                if (!centered) return; // already at bottom
+                centered = false;
+                inputWrapper.classList.remove('centered');
+                messageHistory.classList.remove('blurred');
+                // optional: update bar just for fun
+                chatBar.textContent = '⬇️ moved';
+                setTimeout(() => { chatBar.textContent = '☕'; }, 800);
+            }
+
+            // trigger on any interaction with input (focus, click, or send)
+            function onFirstInteraction() {
+                if (centered) {
+                    moveInputToBottom();
+                }
+            }
+
+            // event listeners: focus, click on input, send button
+            chatInput.addEventListener('focus', onFirstInteraction);
+            chatInput.addEventListener('click', onFirstInteraction);  // just in case
+            sendButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (centered) moveInputToBottom();
+                // optional: later you'll add prep answers – but interface only now
+                if (chatInput.value.trim() !== '') {
+                    // tiny demo: simulate user message add (just for feel)
+                    const userText = chatInput.value.trim();
+                    const userDiv = document.createElement('div');
+                    userDiv.className = 'user-message';
+                    userDiv.textContent = userText;
+                    messageHistory.appendChild(userDiv);
+                    chatInput.value = '';
+
+                    // bot mock static answer
+                    const botDiv = document.createElement('div');
+                    botDiv.className = 'bot-message';
+                    botDiv.textContent = 'pre-prepared answer coming soon...';
+                    messageHistory.appendChild(botDiv);
+
+                    // scroll
+                    messageHistory.scrollTop = messageHistory.scrollHeight;
+                }
+            });
+
+            // also on pressing Enter
+            chatInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (centered) moveInputToBottom();
+                    // optional same as above (but keep consistent)
+                    if (chatInput.value.trim() !== '') {
+                        const userText = chatInput.value.trim();
+                        const userDiv = document.createElement('div');
+                        userDiv.className = 'user-message';
+                        userDiv.textContent = userText;
+                        messageHistory.appendChild(userDiv);
+                        chatInput.value = '';
+
+                        const botDiv = document.createElement('div');
+                        botDiv.className = 'bot-message';
+                        botDiv.textContent = 'pre-prepared answer loaded.';
+                        messageHistory.appendChild(botDiv);
+                        messageHistory.scrollTop = messageHistory.scrollHeight;
+                    }
+                }
+            });
+
+            // if user clicks on history (but it's semi-transparent, they might still)
+            messageHistory.addEventListener('click', function() {
+                if (centered) moveInputToBottom();
+            });
+
+            // also on any keydown (in case they just start typing without focusing?)
+            // but focus handles it. Good.
+
+            // keep the initial feel: 0 -> tea symbol
+            chatBar.textContent = '⊹';
+        })();
+    </script>
+</body>
 </html>
