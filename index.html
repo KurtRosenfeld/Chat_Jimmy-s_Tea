@@ -317,22 +317,7 @@
         function onInteraction() {
             if (centered) moveToBottom();
         }
-// faster typing animation
-function typeText(text) {
-    let index = 0;
-    textDiv.textContent = '';
-    
-    function type() {
-        if (index < text.length) {
-            textDiv.textContent += text.charAt(index);
-            index++;
-            // Very fast typing (20ms per character)
-            setTimeout(type, 20);
-        } else {
-            // Show media buttons when done
-            mediaDiv.style.opacity = '1';
-        }
-    }
+
     
     type();
 }
@@ -400,115 +385,103 @@ function typeText(text) {
             return fallbackResponse;
         }
 
-// function to create a response bubble with optional media and typing animation
-function createResponseBubble(response) {
-    const container = document.createElement('div');
-    container.className = 'bot-message';
+        // function to create a response bubble with optional media
+        function createResponseBubble(response) {
+            const container = document.createElement('div');
+            container.className = 'bot-message';
+            
+            // text part
+            const textDiv = document.createElement('div');
+            textDiv.textContent = response.text;
+            container.appendChild(textDiv);
+
+            // faster typing animation
+function typeText(text) {
+    let index = 0;
+    textDiv.textContent = '';
     
-    // text part with typing animation
-    const textDiv = document.createElement('div');
-    textDiv.style.whiteSpace = 'pre-line';
-    textDiv.style.minHeight = '24px'; // prevents layout shift
-    container.appendChild(textDiv);
-    
-    // media row (sound + picture placeholders) - initially hidden
-    const mediaDiv = document.createElement('div');
-    mediaDiv.style.cssText = `
-        display: flex;
-        gap: 15px;
-        margin-top: 12px;
-        align-items: center;
-        font-size: 0.9rem;
-        opacity: 0;
-        transition: opacity 0.3s;
-    `;
-    
-    // sound placeholder
-    const soundSpan = document.createElement('span');
-    soundSpan.style.cssText = `
-        background: rgba(255,255,255,0.2);
-        padding: 6px 12px;
-        border-radius: 30px;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        cursor: pointer;
-        transition: 0.2s;
-    `;
-    soundSpan.innerHTML = '🔊 sound';
-    soundSpan.title = `would play: ${response.sound}`;
-    soundSpan.onclick = () => alert(`🔊 Playing: ${response.sound} (sound placeholder)`);
-    
-    // picture placeholder
-    const picSpan = document.createElement('span');
-    picSpan.style.cssText = `
-        background: rgba(255,255,255,0.2);
-        padding: 6px 12px;
-        border-radius: 30px;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        cursor: pointer;
-        transition: 0.2s;
-    `;
-    picSpan.innerHTML = '🖼️ picture';
-    picSpan.title = `would show: ${response.picture || 'no image'}`;
-    picSpan.onclick = () => {
-        if (!response.picture) {
-            alert('No picture for this response');
-            return;
+    function type() {
+        if (index < text.length) {
+            textDiv.textContent += text.charAt(index);
+            index++;
+            // Very fast typing (20ms per character)
+            setTimeout(type, 20);
+        } else {
+            // Show media buttons when done
+            mediaDiv.style.opacity = '1';
         }
-        const preview = document.createElement('div');
-        preview.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            z-index: 1000;
-            text-align: center;
-        `;
-        preview.innerHTML = `
-            <div style="margin-bottom: 10px;">🖼️ ${response.picture}</div>
-            <div style="width: 200px; height: 150px; background: linear-gradient(45deg, #ccc, #eee); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 2px dashed #999;">
-                image placeholder
-            </div>
-            <button onclick="this.parentElement.remove()" style="margin-top: 15px; padding: 8px 20px; border-radius: 30px; border: none; background: #2c3e50; color: white; cursor: pointer;">close</button>
-        `;
-        document.body.appendChild(preview);
-    };
-    
-    mediaDiv.appendChild(soundSpan);
-    mediaDiv.appendChild(picSpan);
-    container.appendChild(mediaDiv);
-    
-    // faster typing animation (defined inside so it has access to textDiv and mediaDiv)
-    function typeText(text) {
-        let index = 0;
-        textDiv.textContent = '';
-        
-        function type() {
-            if (index < text.length) {
-                textDiv.textContent += text.charAt(index);
-                index++;
-                // Very fast typing (20ms per character)
-                setTimeout(type, 20);
-            } else {
-                // Show media buttons when done
-                mediaDiv.style.opacity = '1';
-            }
-        }
-        
-        type();
     }
     
-    // Start typing animation
-    typeText(response.text);
-    
-    return container;
+            // media row (sound + picture placeholders)
+            const mediaDiv = document.createElement('div');
+            mediaDiv.style.cssText = `
+                display: flex;
+                gap: 15px;
+                margin-top: 12px;
+                align-items: center;
+                font-size: 0.9rem;
+            `;
+            
+            // sound placeholder
+            const soundSpan = document.createElement('span');
+            soundSpan.style.cssText = `
+                background: rgba(255,255,255,0.2);
+                padding: 6px 12px;
+                border-radius: 30px;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                cursor: pointer;
+                transition: 0.2s;
+            `;
+            soundSpan.innerHTML = '🔊 sound';
+            soundSpan.title = `would play: ${response.sound}`;
+            soundSpan.onclick = () => alert(`🔊 Playing: ${response.sound} (sound placeholder)`);
+            
+            // picture placeholder
+            const picSpan = document.createElement('span');
+            picSpan.style.cssText = `
+                background: rgba(255,255,255,0.2);
+                padding: 6px 12px;
+                border-radius: 30px;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                cursor: pointer;
+                transition: 0.2s;
+            `;
+            picSpan.innerHTML = '🖼️ picture';
+            picSpan.title = `would show: ${response.picture}`;
+            picSpan.onclick = () => {
+                // create a temporary image preview
+                const preview = document.createElement('div');
+                preview.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: white;
+                    padding: 20px;
+                    border-radius: 20px;
+                    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+                    z-index: 1000;
+                    text-align: center;
+                `;
+                preview.innerHTML = `
+                    <div style="margin-bottom: 10px;">🖼️ ${response.picture}</div>
+                    <div style="width: 200px; height: 150px; background: linear-gradient(45deg, #ccc, #eee); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 2px dashed #999;">
+                        image placeholder
+                    </div>
+                    <button onclick="this.parentElement.remove()" style="margin-top: 15px; padding: 8px 20px; border-radius: 30px; border: none; background: #2c3e50; color: white; cursor: pointer;">close</button>
+                `;
+                document.body.appendChild(preview);
+            };
+            
+            mediaDiv.appendChild(soundSpan);
+            mediaDiv.appendChild(picSpan);
+            container.appendChild(mediaDiv);
+            
+            return container;
 }
         }
 
