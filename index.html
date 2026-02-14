@@ -6,7 +6,7 @@
   </head>
   <style>
     body{
-   font-family: 'Comic Sans'
+   font-family: 'Comic Sans', cursive, sans-serif;
   background: linear-gradient(135deg, #EDEDED, #D8D8D8, #FCFCFC);
             display: flex;
             flex-direction: column;
@@ -16,6 +16,21 @@
             padding: 20px;
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
+        }
+            @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+            .chat-container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(8px);
+            border-radius: 36px 36px 28px 28px;
+            box-shadow: 0 25px 40px -12px rgba(0, 20, 20, 0.35);
+            padding: 30px 25px 30px 25px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
         }
             .chat-bar {
             font-size: 3rem;
@@ -29,10 +44,91 @@
             animation: glow 2s infinite alternate;
             min-width: 200px;
         }
+    .message-history {
+    background: rgba(44, 62, 80, 0.06);
+    border-radius: 24px;
+    padding: 20px;
+    min-height: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    border: 2px dashed rgba(44, 62, 80, 0.2);
+}
+
+.input-area {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 50px;
+    padding: 5px 5px 5px 20px;
+    border: 2px solid rgba(44, 62, 80, 0.3);
+}
+
+.chat-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-family: 'Comic Sans', cursive, sans-serif;
+    font-size: 1.2rem;
+    padding: 15px 0;
+    background: transparent;
+}
+
+.chat-input::placeholder {
+    color: #95a5a6;
+}
+
+.send-button {
+    background: #2c3e50;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.send-button:hover {
+    background: #f39c12;
+}
+    .bot-message, .user-message {
+    padding: 12px 18px;
+    border-radius: 20px;
+    margin: 10px 0;
+    max-width: 70%;
+    word-wrap: break-word;
+}
+
+.bot-message {
+    background: #2c3e50;
+    color: white;
+    align-self: flex-start;
+}
+
+.user-message {
+    background: #f39c12;
+    color: #1e2b37;
+    align-self: flex-end;
+    margin-left: auto;
+}
 </style>
   <body>
-     <h1>How can I help you?</h1>
-    <div class="chat-bar" id="chatBar">0</div>
+     <h1>How can I help you, ya' Tosspot?</h1>
+  <div class="chat-container">
+    <div class="message-history" id="messageHistory">
+    <!-- messages will appear here -->
+        <div class="bot-message">Hello! How can I help you today?</div>
+<div class="user-message">I have a question about tea</div>
+    </div>
+    <div class="input-area">
+    <input type="text" 
+           class="chat-input" 
+           id="chatInput" 
+           placeholder="What ya' feelin' right now...">
+    <button class="send-button">Send</button>
+</div>
+    </div>
   </body>
   </body>
 </html>
