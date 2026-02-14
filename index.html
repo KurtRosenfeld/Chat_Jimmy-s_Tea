@@ -317,7 +317,25 @@
         function onInteraction() {
             if (centered) moveToBottom();
         }
-
+// faster typing animation
+function typeText(text) {
+    let index = 0;
+    textDiv.textContent = '';
+    
+    function type() {
+        if (index < text.length) {
+            textDiv.textContent += text.charAt(index);
+            index++;
+            // Very fast typing (20ms per character)
+            setTimeout(type, 20);
+        } else {
+            // Show media buttons when done
+            mediaDiv.style.opacity = '1';
+        }
+    }
+    
+    type();
+}
         // ========== KEYWORD RESPONSE SYSTEM ==========
         const keywordResponses = [
             {
