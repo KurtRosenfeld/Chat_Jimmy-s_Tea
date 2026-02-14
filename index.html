@@ -293,86 +293,225 @@
         </div>
     </div>
 
-    <script>
-        (function() {
-            const inputWrapper = document.getElementById('inputWrapper');
-            const messageHistory = document.getElementById('messageHistory');
-            const chatInput = document.getElementById('chatInput');
-            const sendButton = document.getElementById('sendButton');
+<script>
+    (function() {
+        const inputWrapper = document.getElementById('inputWrapper');
+        const messageHistory = document.getElementById('messageHistory');
+        const chatInput = document.getElementById('chatInput');
+        const sendButton = document.getElementById('sendButton');
 
-            // NO initial message - history starts empty
+        let centered = true;
 
-            let centered = true;
+        // fade history when centered
+        if (centered) {
+            messageHistory.classList.add('faded');
+        }
 
-            // fade history when centered
-            if (centered) {
-                messageHistory.classList.add('faded');
+        function moveToBottom() {
+            if (!centered) return;
+            centered = false;
+            inputWrapper.classList.remove('centered');
+            messageHistory.classList.remove('faded');
+        }
+
+        function onInteraction() {
+            if (centered) moveToBottom();
+        }
+
+        // ========== KEYWORD RESPONSE SYSTEM ==========
+        const keywordResponses = [
+            {
+                keywords: ['jezus', 'jesus', 'christ', 'lord'],
+                response: {
+                    text: "Ah, you speak of the carpenter from Nazareth. Fascinating figure.",
+                    sound: "sounds/jezus_bell.mp3",  // placeholder path
+                    picture: "images/jezus_placeholder.jpg"  // placeholder path
+                }
+            },
+            {
+                keywords: ['power', 'strength', 'force', 'might'],
+                response: {
+                    text: "Power manifests in many forms. Inner strength is the rarest kind.",
+                    sound: "sounds/power_rumble.mp3",
+                    picture: "images/power_placeholder.jpg"
+                }
+            },
+            {
+                keywords: ['tea', 'chai', 'earl grey', 'brew'],
+                response: {
+                    text: "Proper tea is the answer to everything, isn't it?",
+                    sound: "sounds/tea_pour.mp3",
+                    picture: "images/tea_placeholder.jpg"
+                }
+            },
+            {
+                keywords: ['computer', 'code', 'program', 'software'],
+                response: {
+                    text: "01001000 01100101 01101100 01101100 01101111 — oh, sorry. Got carried away.",
+                    sound: "sounds/computer_beep.mp3",
+                    picture: "images/code_placeholder.jpg"
+                }
+            },
+            {
+                keywords: ['love', 'heart', 'romance', 'feelings'],
+                response: {
+                    text: "Love is like a fine tea — better when shared.",
+                    sound: "sounds/love_harp.mp3",
+                    picture: "images/love_placeholder.jpg"
+                }
             }
+        ];
 
-            function moveToBottom() {
-                if (!centered) return;
-                centered = false;
-                inputWrapper.classList.remove('centered');
-                messageHistory.classList.remove('faded');
-            }
+        // fallback response if no keyword matches
+        const fallbackResponse = {
+            text: "Can you please rephrase the question?",
+            sound: "sounds/error_blip.mp3",
+            picture: "images/confused_placeholder.jpg"
+        };
 
-            function onInteraction() {
-                if (centered) moveToBottom();
-            }
-
-            // events that trigger move
-            chatInput.addEventListener('focus', onInteraction);
-            chatInput.addEventListener('click', onInteraction);
+        // function to check message against keywords (case insensitive)
+        function findResponse(userMessage) {
+            const lowerMessage = userMessage.toLowerCase();
             
-            sendButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (centered) moveToBottom();
+            for (let item of keywordResponses) {
+                for (let keyword of item.keywords) {
+                    if (lowerMessage.includes(keyword)) {
+                        return item.response;
+                    }
+                }
+            }
+            return fallbackResponse;
+        }
+
+        // function to create a response bubble with optional media
+        function createResponseBubble(response) {
+            const container = document.createElement('div');
+            container.className = 'bot-message';
+            
+            // text part
+            const textDiv = document.createElement('div');
+            textDiv.textContent = response.text;
+            container.appendChild(textDiv);
+            
+            // media row (sound + picture placeholders)
+            const mediaDiv = document.createElement('div');
+            mediaDiv.style.cssText = `
+                display: flex;
+                gap: 15px;
+                margin-top: 12px;
+                align-items: center;
+                font-size: 0.9rem;
+            `;
+            
+            // sound placeholder
+            const soundSpan = document.createElement('span');
+            soundSpan.style.cssText = `
+                background: rgba(255,255,255,0.2);
+                padding: 6px 12px;
+                border-radius: 30px;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                cursor: pointer;
+                transition: 0.2s;
+            `;
+            soundSpan.innerHTML = '🔊 sound';
+            soundSpan.title = `would play: ${response.sound}`;
+            soundSpan.onclick = () => alert(`🔊 Playing: ${response.sound} (sound placeholder)`);
+            
+            // picture placeholder
+            const picSpan = document.createElement('span');
+            picSpan.style.cssText = `
+                background: rgba(255,255,255,0.2);
+                padding: 6px 12px;
+                border-radius: 30px;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                cursor: pointer;
+                transition: 0.2s;
+            `;
+            picSpan.innerHTML = '🖼️ picture';
+            picSpan.title = `would show: ${response.picture}`;
+            picSpan.onclick = () => {
+                // create a temporary image preview
+                const preview = document.createElement('div');
+                preview.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: white;
+                    padding: 20px;
+                    border-radius: 20px;
+                    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+                    z-index: 1000;
+                    text-align: center;
+                `;
+                preview.innerHTML = `
+                    <div style="margin-bottom: 10px;">🖼️ ${response.picture}</div>
+                    <div style="width: 200px; height: 150px; background: linear-gradient(45deg, #ccc, #eee); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 2px dashed #999;">
+                        image placeholder
+                    </div>
+                    <button onclick="this.parentElement.remove()" style="margin-top: 15px; padding: 8px 20px; border-radius: 30px; border: none; background: #2c3e50; color: white; cursor: pointer;">close</button>
+                `;
+                document.body.appendChild(preview);
+            };
+            
+            mediaDiv.appendChild(soundSpan);
+            mediaDiv.appendChild(picSpan);
+            container.appendChild(mediaDiv);
+            
+            return container;
+        }
+
+        // events that trigger move
+        chatInput.addEventListener('focus', onInteraction);
+        chatInput.addEventListener('click', onInteraction);
+        
+        sendButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (centered) moveToBottom();
+            
+            const text = chatInput.value.trim();
+            if (text !== '') {
+                // add user message
+                const userDiv = document.createElement('div');
+                userDiv.className = 'user-message';
+                userDiv.textContent = text;
+                messageHistory.appendChild(userDiv);
+
+                // find matching response
+                const response = findResponse(text);
                 
-                const text = chatInput.value.trim();
-                if (text !== '') {
-                    // add user message
-                    const userDiv = document.createElement('div');
-                    userDiv.className = 'user-message';
-                    userDiv.textContent = text;
-                    messageHistory.appendChild(userDiv);
+                // create and add bot response with media
+                const botDiv = createResponseBubble(response);
+                messageHistory.appendChild(botDiv);
 
-                    // fake bot reply (pre-prepared feel)
-                    const botDiv = document.createElement('div');
-                    botDiv.className = 'bot-message';
-                    const replies = [
-                        "Interesting. Tell me more.",
-                        "I see. Go on.",
-                        "And how does that make you feel?",
-                        "Why do you say that?",
-                        "That's something to think about."
-                    ];
-                    botDiv.textContent = replies[Math.floor(Math.random() * replies.length)];
-                    messageHistory.appendChild(botDiv);
+                chatInput.value = '';
+                messageHistory.scrollTop = messageHistory.scrollHeight;
+            }
+        });
 
-                    chatInput.value = '';
-                    messageHistory.scrollTop = messageHistory.scrollHeight;
-                }
-            });
+        chatInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendButton.click();
+            }
+        });
 
-            chatInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    sendButton.click();
-                }
-            });
-
-            // clicking on sidebar items also brings input down
-            document.querySelectorAll('.conv-item, .new-chat-btn').forEach(el => {
-                el.addEventListener('click', () => {
-                    if (centered) moveToBottom();
-                });
-            });
-
-            // if user clicks on history (though faded)
-            messageHistory.addEventListener('click', () => {
+        // clicking on sidebar items also brings input down
+        document.querySelectorAll('.conv-item, .new-chat-btn').forEach(el => {
+            el.addEventListener('click', () => {
                 if (centered) moveToBottom();
             });
-        })();
-    </script>
+        });
+
+        // if user clicks on history (though faded)
+        messageHistory.addEventListener('click', () => {
+            if (centered) moveToBottom();
+        });
+    })();
+</script>
 </body>
 </html>
