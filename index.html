@@ -464,11 +464,21 @@
                 picDiv.className = 'bot-picture';
                 picDiv.style.opacity = '0';
                 picDiv.style.transition = 'opacity 0.3s';
-                picDiv.innerHTML = `
-                    <div class="picture-placeholder">
-                        🖼️ ${response.picture.split('/').pop()}
-                    </div>
-                `;
+                // Create actual image element
+const img = document.createElement('img');
+img.src = response.picture;  // This should be the path to your image file
+img.alt = 'Bot response image';
+img.style.cssText = `
+    width: 100%;
+    max-width: 200px;
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.3);
+    display: block;
+`;
+
+// Clear the picDiv and add the real image
+picDiv.innerHTML = '';
+picDiv.appendChild(img);
                 container.appendChild(picDiv);
             }
             
