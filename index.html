@@ -174,6 +174,31 @@
             border-bottom-right-radius: 8px;
         }
 
+        /* picture styling - appears inline */
+        .bot-picture {
+            margin-top: 12px;
+            border-radius: 16px;
+            overflow: hidden;
+            max-width: 200px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(0,0,0,0.1);
+            padding: 8px;
+            text-align: center;
+        }
+        
+        .picture-placeholder {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(45deg, #667, #889);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+            border: 1px dashed rgba(255,255,255,0.5);
+        }
+
         /* INPUT WRAPPER - this moves */
         .input-wrapper {
             max-width: 750px;
@@ -302,6 +327,14 @@
         </div>
     </div>
 
+    <!-- Hidden audio elements for autoplay -->
+    <audio id="sound-jezus" src="sounds/jezus_bell.mp3" preload="auto"></audio>
+    <audio id="sound-power" src="sounds/power_rumble.mp3" preload="auto"></audio>
+    <audio id="sound-tea" src="sounds/tea_pour.mp3" preload="auto"></audio>
+    <audio id="sound-computer" src="sounds/computer_beep.mp3" preload="auto"></audio>
+    <audio id="sound-love" src="sounds/love_harp.mp3" preload="auto"></audio>
+    <audio id="sound-error" src="sounds/error_blip.mp3" preload="auto"></audio>
+
 <script>
     (function() {
         const inputWrapper = document.getElementById('inputWrapper');
@@ -333,7 +366,7 @@
                 keywords: ['hi', 'fresh', 'good day', 'jimmy'],
                 response: {
                     text: "Ah, it's you again...\nDid you know how I hate you???\nSo tell we why ya' annoying me again...",
-                    sound: "sounds/jezus_bell.mp3",
+                    sound: "jezus",
                     picture: "images/jezus_placeholder.jpg"
                 }
             },
@@ -341,7 +374,7 @@
                 keywords: ['power', 'strength', 'force', 'might'],
                 response: {
                     text: "Power manifests in many forms. Inner strength is the rarest kind.",
-                    sound: "sounds/power_rumble.mp3",
+                    sound: "power",
                     picture: "images/power_placeholder.jpg"
                 }
             },
@@ -349,7 +382,7 @@
                 keywords: ['tea', 'chai', 'earl grey', 'brew'],
                 response: {
                     text: "Proper tea is the answer to everything, isn't it?",
-                    sound: "sounds/tea_pour.mp3",
+                    sound: "tea",
                     picture: "images/tea_placeholder.jpg"
                 }
             },
@@ -357,7 +390,7 @@
                 keywords: ['computer', 'code', 'program', 'software'],
                 response: {
                     text: "01001000 01100101 01101100 01101100 01101111 — oh, sorry. Got carried away.",
-                    sound: "sounds/computer_beep.mp3",
+                    sound: "computer",
                     picture: "images/code_placeholder.jpg"
                 }
             },
@@ -365,7 +398,7 @@
                 keywords: ['love', 'heart', 'romance', 'feelings'],
                 response: {
                     text: "Love is like a fine tea — better when shared.",
-                    sound: "sounds/love_harp.mp3",
+                    sound: "love",
                     picture: "images/love_placeholder.jpg"
                 }
             }
@@ -374,9 +407,22 @@
         // fallback response if no keyword matches
         const fallbackResponse = {
             text: "Can you please rephrase the question?",
-            sound: "sounds/error_blip.mp3",
-            picture: "images/confused_placeholder.jpg"
+            sound: "error",
+            picture: null  // no picture for fallback
         };
+
+        // function to play sound
+        function playSound(soundId) {
+            try {
+                const audio = document.getElementById(`sound-${soundId}`);
+                if (audio) {
+                    audio.currentTime = 0; // restart if already playing
+                    audio.play().catch(e => console.log('Audio play failed:', e));
+                }
+            } catch (e) {
+                console.log('Sound error:', e);
+            }
+        }
 
         // function to check message against keywords (case insensitive)
         function findResponse(userMessage) {
@@ -403,79 +449,20 @@
             textDiv.style.minHeight = '24px';
             container.appendChild(textDiv);
             
-            // media row (sound + picture placeholders) - initially hidden
-            const mediaDiv = document.createElement('div');
-            mediaDiv.style.cssText = `
-                display: flex;
-                gap: 15px;
-                margin-top: 12px;
-                align-items: center;
-                font-size: 0.9rem;
-                opacity: 0;
-                transition: opacity 0.3s;
-            `;
-            
-            // sound placeholder
-            const soundSpan = document.createElement('span');
-            soundSpan.style.cssText = `
-                background: rgba(255,255,255,0.2);
-                padding: 6px 12px;
-                border-radius: 30px;
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                cursor: pointer;
-                transition: 0.2s;
-            `;
-            soundSpan.innerHTML = '🔊 sound';
-            soundSpan.title = `would play: ${response.sound}`;
-            soundSpan.onclick = () => alert(`🔊 Playing: ${response.sound} (sound placeholder)`);
-            
-            // picture placeholder
-            const picSpan = document.createElement('span');
-            picSpan.style.cssText = `
-                background: rgba(255,255,255,0.2);
-                padding: 6px 12px;
-                border-radius: 30px;
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                cursor: pointer;
-                transition: 0.2s;
-            `;
-            picSpan.innerHTML = '🖼️ picture';
-            picSpan.title = `would show: ${response.picture || 'no image'}`;
-            picSpan.onclick = () => {
-                if (!response.picture) {
-                    alert('No picture for this response');
-                    return;
-                }
-                const preview = document.createElement('div');
-                preview.style.cssText = `
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: white;
-                    padding: 20px;
-                    border-radius: 20px;
-                    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-                    z-index: 1000;
-                    text-align: center;
-                `;
-                preview.innerHTML = `
-                    <div style="margin-bottom: 10px;">🖼️ ${response.picture}</div>
-                    <div style="width: 200px; height: 150px; background: linear-gradient(45deg, #ccc, #eee); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 2px dashed #999;">
-                        image placeholder
+            // picture container (only if picture exists) - initially hidden
+            let picDiv = null;
+            if (response.picture) {
+                picDiv = document.createElement('div');
+                picDiv.className = 'bot-picture';
+                picDiv.style.opacity = '0';
+                picDiv.style.transition = 'opacity 0.3s';
+                picDiv.innerHTML = `
+                    <div class="picture-placeholder">
+                        🖼️ ${response.picture.split('/').pop()}
                     </div>
-                    <button onclick="this.parentElement.remove()" style="margin-top: 15px; padding: 8px 20px; border-radius: 30px; border: none; background: #2c3e50; color: white; cursor: pointer;">close</button>
                 `;
-                document.body.appendChild(preview);
-            };
-            
-            mediaDiv.appendChild(soundSpan);
-            mediaDiv.appendChild(picSpan);
-            container.appendChild(mediaDiv);
+                container.appendChild(picDiv);
+            }
             
             // typing animation
             function typeText(text) {
@@ -486,9 +473,12 @@
                     if (index < text.length) {
                         textDiv.textContent += text.charAt(index);
                         index++;
-                        setTimeout(type, 30); // 30ms per character for smooth animation
+                        setTimeout(type, 30);
                     } else {
-                        mediaDiv.style.opacity = '1';
+                        // When typing is done, show picture if exists
+                        if (picDiv) {
+                            picDiv.style.opacity = '1';
+                        }
                     }
                 }
                 
@@ -497,6 +487,13 @@
             
             // Start typing animation
             typeText(response.text);
+            
+            // Auto-play sound when message appears
+            if (response.sound) {
+                setTimeout(() => {
+                    playSound(response.sound);
+                }, 100); // small delay to feel like sound comes with message
+            }
             
             return container;
         }
