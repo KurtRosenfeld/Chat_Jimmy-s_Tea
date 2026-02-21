@@ -60,6 +60,15 @@
             opacity: 0.7;
         }
 
+        .day-label {
+            color: #2c3e50;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            margin: 5px 0 5px 12px;
+            opacity: 0.6;
+            text-transform: uppercase;
+        }
+
         .conv-item {
             background: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(4px);
@@ -318,17 +327,14 @@
             if (centered) moveToBottom();
         }
 
-    
-    type();
-}
         // ========== KEYWORD RESPONSE SYSTEM ==========
         const keywordResponses = [
             {
                 keywords: ['hi', 'fresh', 'good day', 'jimmy'],
                 response: {
                     text: "Ah, it's you again...\nDid you know how I hate you???\nSo tell we why ya' annoying me again...",
-                    sound: "sounds/jezus_bell.mp3",  // placeholder path
-                    picture: "images/jezus_placeholder.jpg"  // placeholder path
+                    sound: "sounds/jezus_bell.mp3",
+                    picture: "images/jezus_placeholder.jpg"
                 }
             },
             {
@@ -369,6 +375,7 @@
         const fallbackResponse = {
             text: "Can you please rephrase the question?",
             sound: "sounds/error_blip.mp3",
+            picture: "images/confused_placeholder.jpg"
         };
 
         // function to check message against keywords (case insensitive)
@@ -385,34 +392,18 @@
             return fallbackResponse;
         }
 
-        // function to create a response bubble with optional media
+        // function to create a response bubble with typing animation
         function createResponseBubble(response) {
             const container = document.createElement('div');
             container.className = 'bot-message';
             
-            // text part
+            // text part with typing animation
             const textDiv = document.createElement('div');
-            textDiv.textContent = response.text;
+            textDiv.style.whiteSpace = 'pre-line';
+            textDiv.style.minHeight = '24px';
             container.appendChild(textDiv);
-
-            // faster typing animation
-function typeText(text) {
-    let index = 0;
-    textDiv.textContent = '';
-    
-    function type() {
-        if (index < text.length) {
-            textDiv.textContent += text.charAt(index);
-            index++;
-            // Very fast typing (20ms per character)
-            setTimeout(type, 20);
-        } else {
-            // Show media buttons when done
-            mediaDiv.style.opacity = '1';
-        }
-    }
-    
-            // media row (sound + picture placeholders)
+            
+            // media row (sound + picture placeholders) - initially hidden
             const mediaDiv = document.createElement('div');
             mediaDiv.style.cssText = `
                 display: flex;
@@ -420,6 +411,8 @@ function typeText(text) {
                 margin-top: 12px;
                 align-items: center;
                 font-size: 0.9rem;
+                opacity: 0;
+                transition: opacity 0.3s;
             `;
             
             // sound placeholder
@@ -451,9 +444,12 @@ function typeText(text) {
                 transition: 0.2s;
             `;
             picSpan.innerHTML = '🖼️ picture';
-            picSpan.title = `would show: ${response.picture}`;
+            picSpan.title = `would show: ${response.picture || 'no image'}`;
             picSpan.onclick = () => {
-                // create a temporary image preview
+                if (!response.picture) {
+                    alert('No picture for this response');
+                    return;
+                }
                 const preview = document.createElement('div');
                 preview.style.cssText = `
                     position: fixed;
@@ -481,8 +477,28 @@ function typeText(text) {
             mediaDiv.appendChild(picSpan);
             container.appendChild(mediaDiv);
             
+            // typing animation
+            function typeText(text) {
+                let index = 0;
+                textDiv.textContent = '';
+                
+                function type() {
+                    if (index < text.length) {
+                        textDiv.textContent += text.charAt(index);
+                        index++;
+                        setTimeout(type, 30); // 30ms per character for smooth animation
+                    } else {
+                        mediaDiv.style.opacity = '1';
+                    }
+                }
+                
+                type();
+            }
+            
+            // Start typing animation
+            typeText(response.text);
+            
             return container;
-}
         }
 
         // events that trigger move
@@ -504,14 +520,9 @@ function typeText(text) {
                 // find matching response
                 const response = findResponse(text);
                 
-                // create and add bot response with media
+                // create and add bot response with typing animation
                 const botDiv = createResponseBubble(response);
                 messageHistory.appendChild(botDiv);
-
-                // text part with line breaks
-const textDiv = document.createElement('div');
-textDiv.style.whiteSpace = 'pre-line';  // This makes \n create line breaks
-textDiv.textContent = response.text;
 
                 chatInput.value = '';
                 messageHistory.scrollTop = messageHistory.scrollHeight;
